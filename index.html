@@ -876,12 +876,42 @@
     </main>
   </div>
 
+  <div id="capture-shield" class="pointer-events-none fixed inset-0 bg-black/95 text-[#D4AF37] flex flex-col items-center justify-center gap-3 text-center text-xs sm:text-sm tracking-[0.3em] uppercase z-[9999] hidden">
+    <span class="px-6 py-2 border border-[#D4AF37]/60 rounded-full bg-black/40">Screen capture disabled</span>
+    <span class="text-neutral-400 tracking-[0.2em]">Respect the privacy of our guests</span>
+  </div>
+
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       if (window.lucide) {
         window.lucide.createIcons();
       }
     });
-  </script>
 
+    const captureShield = document.getElementById("capture-shield");
+    const restrictedCombos = new Set(["p", "s", "u", "c"]);
+
+    function flashShield() {
+      if (!captureShield) return;
+      captureShield.classList.remove("hidden");
+      setTimeout(() => captureShield.classList.add("hidden"), 1600);
+    }
+
+    document.addEventListener("keydown", (event) => {
+      const key = event.key.toLowerCase();
+      const isPrint = key === "printscreen";
+      const isRestricted = event.ctrlKey && restrictedCombos.has(key);
+
+      if (isPrint || isRestricted) {
+        event.preventDefault();
+        navigator.clipboard.writeText("Screen capture disabled by Noir Aurelia.");
+        flashShield();
+      }
+    });
+
+    window.addEventListener("blur", () => {
+      flashShield();
+      navigator.clipboard.writeText("Screen capture disabled by Noir Aurelia.");
+    });
+  </script>
 </body></html>
